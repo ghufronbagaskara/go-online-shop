@@ -8,7 +8,7 @@ import (
 func migrate(db *sql.DB) (sql.Result, error) {
 
 	if db == nil {
-		return nil, errors.New("Connection at db were unavailable")
+		return nil, errors.New("connection at db were unavailable")
 	}
 	
 	return db.Exec(`
