@@ -21,7 +21,7 @@ func SelectProduct(db *sql.DB)([]Product, error){
 		return nil, ErrDBNil
 	}
 	
-	query := `SELECT id, name, price FROM Products WHERE id_deleted = false`
+	query := `SELECT id, name, price FROM Products WHERE is_deleted=false`
 	rows, err := db.Query(query)
 	if err != nil {
 		return nil, err 
@@ -39,4 +39,20 @@ func SelectProduct(db *sql.DB)([]Product, error){
 	}
 
 	return products, nil
+}
+
+func SelectProductByID(db *sql.DB, id string) (Product, error)  {
+	if db == nil {
+		return Product{}, ErrDBNil
+	}
+
+	query := `SELECT id, name, price FROM Products WHERE is_deleted=false AND id=$1`
+	var product Product
+	row := db.QueryRow(query, id)
+	if err := row.Scan(&product.ID, &product.Name, &product.Price); err != nil {
+		return Product{}, err
+	}
+
+	return product, nil
+	
 }
