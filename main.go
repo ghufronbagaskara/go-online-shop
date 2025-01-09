@@ -59,6 +59,4 @@ func main() {
 		fmt.Printf("Error running server: %v \n", err)
 		os.Exit(1)
 	}
-
-
 }

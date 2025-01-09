@@ -155,17 +155,52 @@ func ConfirmOrder(db *sql.DB) gin.HandlerFunc {
 		}
 
 		//TODO: update and confirm the order
-		// current := time.Now()
-		// if err = model.UpdateOrderById(db, id, confirmReq, current); err != nil {
-		// 	log.Printf("Error when updating order data: %v \n", err)
-		// 	c.JSON(500, gin.H{"error": "Server error"})
-		// 	return
-		// }
+		current := time.Now()
+		if err = model.UpdateOrderById(db, id, confirmReq, current); err != nil {
+			log.Printf("Error when updating order data: %v \n", err)
+			c.JSON(500, gin.H{"error": "Server error"})
+			return
+		}
+
+		order.Passcode = nil
+		
+		order.PaidAt = &current
+		order.PaidBank = &confirmReq.Bank
+		order.PaidAccountNumber = &confirmReq.AccountNumber
+		
+		c.JSON(200, order)
 	}
 }
 
 func GetOrder(db *sql.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		//TODO: retrieve id from param
+		id := c.Param("id")
 
+		//TODO: retrieve passcode from query parameter
+		passcode := c.Query("passcode")
+
+		//TODO: fetch order data from db
+		order, err := model.SelectOrderById(db, id)
+		if err != nil {
+			log.Printf("Error when fetching order data: %v \n", err)
+			c.JSON(500, gin.H{"error": "Server error"})
+			return
+		}
+
+		//TODO: verify passcode
+		if order.Passcode == nil {
+			log.Println("Passcode unvalid at confirm order")
+			c.JSON(400, gin.H{"error": "Order data invalid"})
+			return
+		}
+		if err = bcrypt.CompareHashAndPassword([]byte(*order.Passcode), []byte(passcode)); err != nil {
+			log.Printf("Error when verify passcode: %v \n", err)
+			c.JSON(401, gin.H{"error": "Unallowed to access order"})
+			return
+		}
+		
+		order.Passcode = nil
+		c.JSON(200, order)
 	}
 }
