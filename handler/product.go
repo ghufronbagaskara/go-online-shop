@@ -50,7 +50,6 @@ func GetProduct(db *sql.DB) gin.HandlerFunc{
 }
 
 
-
 // admin
 func CreateProduct(db *sql.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
