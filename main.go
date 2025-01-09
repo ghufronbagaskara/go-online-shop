@@ -45,8 +45,8 @@ func main() {
 	r.POST("/api/v1/orders/:id/confirm")
 	r.GET("/api/v1/orders/:id")
 
-	r.POST("/admin/products")
-	r.PUT("/admin/products/:id")
+	r.POST("/admin/products", handler.CreateProduct(db))
+	r.PUT("/admin/products/:id", handler.UpdateProduct(db))
 	r.DELETE("/admin/products/:id")
 
 	// 4. running server
