@@ -113,6 +113,15 @@ func UpdateProduct(db *sql.DB) gin.HandlerFunc {
 
 func DeleteProduct(db *sql.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		id := c.Param("id")
 
+		if err := model.DeleteProduct(db, id); err != nil {
+			log.Printf("Error when deleting product: %v \n", err)
+			c.JSON(500, gin.H{"error": "Server error"})
+			return
+		}
+
+		// TODO : do response
+		c.JSON(201, gin.H{"message": "Product deleted succesfully"})
 	}
 }

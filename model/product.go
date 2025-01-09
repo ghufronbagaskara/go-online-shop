@@ -46,7 +46,7 @@ func SelectProductByID(db *sql.DB, id string) (Product, error)  {
 		return Product{}, ErrDBNil
 	}
 
-	query := `SELECT id, name, price FROM Products WHERE is_deleted=false AND id=$1`
+	query := `SELECT id, name, price FROM Products WHERE is_deleted=FALSE AND id=$1`
 	var product Product
 	row := db.QueryRow(query, id)
 	if err := row.Scan(&product.ID, &product.Name, &product.Price); err != nil {
@@ -79,6 +79,20 @@ func UpdateProduct(db *sql.DB, product Product) error {
 
 	query := `UPDATE Products SET name=$1, price=$2 WHERE id=$3;`
 	_, err := db.Exec(query, product.Name, product.Price, product.ID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func DeleteProduct(db *sql.DB, id string) error {
+	if db == nil {
+		return ErrDBNil
+	}
+
+	query := `UPDATE Products SET is_deleted=TRUE WHERE id=$1;`
+	_, err := db.Exec(query, id)
 	if err != nil {
 		return err
 	}
